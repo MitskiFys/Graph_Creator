@@ -1,5 +1,7 @@
 ﻿#pragma once
 #include <vector>
+#include <iostream>
+
 
 using namespace std;
 
@@ -9,7 +11,7 @@ private:
 	vector <vector<int>>AdjacencyMatrix;//Матрица смежности
 	vector <vector<int>>IncidenceMatrix;//Матрица инцидентности
 	vector <int>ShortestWay;
-	int CountOfNods;
+	int CountOfNods = 0;
 public:
 	Graph();//Граф с неизвестным количеством вершин(задается далее) 
 	Graph(int);//Граф с заранее известным количеством вершин (колчество вершин)
@@ -18,5 +20,6 @@ public:
 	void AddDirectionalEdge(int, int, int);//Добавить направленное ребро (начало, конец, длина)
 	void AddBidirectionalEdge(int, int, int);//Добавить двунаправленное ребро (начало, конец, длина) 
 	void DeleteEdge(char);//удалить ребро (регистр ребра из буквенного алфавита)
+	void GetAdjacencyMatrix();//Вывод матрицы
 };
 
