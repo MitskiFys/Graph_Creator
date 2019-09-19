@@ -8,8 +8,8 @@ using namespace std;
 class Graph
 {
 private:
-	vector <vector<int>>AdjacencyMatrix;//Матрица смежности
-	vector <vector<int>>IncidenceMatrix;//Матрица инцидентности
+	Matrix AdjacencyMatrix;//Матрица смежности
+	Matrix IncidenceMatrix;//Матрица инцидентности
 	vector <int>ShortestWay;
 	int CountOfNods = 0;
 public:
@@ -19,7 +19,8 @@ public:
 	void DeleteNode(int);//Удлаить вершину (номер вершины)
 	void AddDirectionalEdge(int, int, int);//Добавить направленное ребро (начало, конец, длина)
 	void AddBidirectionalEdge(int, int, int);//Добавить двунаправленное ребро (начало, конец, длина) 
-	void DeleteEdge(char);//удалить ребро (регистр ребра из буквенного алфавита)
-	void GetAdjacencyMatrix();//Вывод матрицы
+	void DeleteEdge(int);//удалить ребро 
+	void GetAdjacencyMatrix();//Вывод матрицы смежности
+	void GetIncidenceMatrix();//Вывод матрицы инцидентности
 };
 

@@ -5,52 +5,68 @@ Graph::Graph()
 
 }
 
-Graph::Graph(int count)
+Graph::Graph(int Number)
 {
-	CountOfNods = count;
-	for (int i = 0; i < CountOfNods; i++) {
-		vector <int> column;
-		for (int j = 0; j < CountOfNods; j++) {
-			column.push_back(0);
-		}
-		AdjacencyMatrix.push_back(column);
+	for (int i = 0; i < Number; i++) {
+		AdjacencyMatrix.AddNode();
+		IncidenceMatrix.AddColumn();
 	}
 }
 
 void Graph::AddNode()
 {
-
+	AdjacencyMatrix.AddNode();
 }
 
-void Graph::DeleteNode(int)
+void Graph::DeleteNode(int Number)
 {
+	AdjacencyMatrix.DeleteNode(Number);
+	IncidenceMatrix.DeleteColumn(Number);
 }
 
-void Graph::AddDirectionalEdge(int first, int second, int length)
+void Graph::AddDirectionalEdge(int FirstNode, int SecondNode, int Length)
 {
-	AdjacencyMatrix[second - 1][first - 1] = length;
+	AdjacencyMatrix.AddDirectionalEdge(FirstNode, SecondNode, Length);
+	if (IncidenceMatrix.GetCountOfColumns() == 0) {
+		for (int i = 0; i < AdjacencyMatrix.GetCountOfColumns(); i++) {
+			IncidenceMatrix.AddColumn();
+		}
+	}
+	else {
+		IncidenceMatrix.AddRow();
+	}
+	IncidenceMatrix.AddDirectionalEdge(IncidenceMatrix.GetLastIndexColumn(), FirstNode, 1);
+	IncidenceMatrix.AddDirectionalEdge(IncidenceMatrix.GetLastIndexColumn(), SecondNode, -1);
 }
 
-void Graph::AddBidirectionalEdge(int, int, int)
+void Graph::AddBidirectionalEdge(int FirstNode, int SecondNode, int Length)
 {
+	AdjacencyMatrix.AddBidirectionalEdge(FirstNode, SecondNode, Length);
+	if (IncidenceMatrix.GetCountOfColumns() == 0) {
+		for (int i = 0; i < AdjacencyMatrix.GetCountOfColumns(); i++) {
+			IncidenceMatrix.AddColumn();
+		}
+	}
+	else {
+		IncidenceMatrix.AddRow();
+	}
+	IncidenceMatrix.AddDirectionalEdge(IncidenceMatrix.GetLastIndexColumn(), FirstNode, -1);
+	IncidenceMatrix.AddDirectionalEdge(IncidenceMatrix.GetLastIndexColumn(), SecondNode, -1);
 }
 
-void Graph::DeleteEdge(char)
+void Graph::DeleteEdge(int Number)
 {
+		
 }
 
 void Graph::GetAdjacencyMatrix()
 {
-	cout << "  ";
-	for (int i = 0; i < CountOfNods; i++) {
-		cout << i+1 << " ";
-	}
-	cout << endl;
-	for (int i = 0; i < CountOfNods; i++) {
-		cout << i+1 << " ";
-		for (int j = 0; j < CountOfNods; j++) {
-			cout << AdjacencyMatrix[j][i] << ' ';
-		}
-		cout << endl;
-	}
+	AdjacencyMatrix.DrawMatrix();
 }
+
+void Graph::GetIncidenceMatrix()
+{
+	IncidenceMatrix.DrawMatrix();
+}
+
+
