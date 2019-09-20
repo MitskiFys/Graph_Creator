@@ -77,5 +77,3 @@ void Graph::GetIncidenceMatrix()
 {
 	IncidenceMatrix.DrawMatrix();
 }
-
-

@@ -170,7 +170,3 @@ const int& Matrix::operator()(int& Row, int& Column)
 {
 	return (*(*this->Column.find(Row - 1)).second.find(Column - 1)).second;
 }
-
-
-
-

@@ -23,4 +23,3 @@ public:
 	void GetAdjacencyMatrix();//Вывод матрицы смежности
 	void GetIncidenceMatrix();//Вывод матрицы инцидентности
 };
-

@@ -38,6 +38,5 @@ public:
 	bool IssetColumn(int);// Проверить на существование колонки
 
 	const int& operator()(int&, int&);
-
 };
 
