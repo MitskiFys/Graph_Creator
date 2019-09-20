@@ -32,8 +32,12 @@ public:
 	void DrawMatrix();// Вывести матрицу 
 	int GetFirstIndexRow();// Получить первый индекс строки
 	int GetLastIndexColumn();//Получить индекс последнего вставленной строки
-	int GetCountOfColumns();// Получить количество колонок
+	int GetCountOfColumns();// Получить количество строк
+	int GetCountofRows();//Получить количество колонок
 	bool IssetRow(int);// Проверить на существование строки
 	bool IssetColumn(int);// Проверить на существование колонки
+
+	const int& operator()(int&, int&);
+
 };
 

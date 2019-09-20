@@ -9,4 +9,7 @@ int main()
 	grp.AddDirectionalEdge(1, 3, 4);
 	grp.GetAdjacencyMatrix();
 	grp.GetIncidenceMatrix();
+	grp.DeleteEdge(1);
+	grp.GetAdjacencyMatrix();
+	grp.GetIncidenceMatrix();
 }

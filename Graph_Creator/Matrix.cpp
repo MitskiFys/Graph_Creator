@@ -139,6 +139,12 @@ int Matrix::GetCountOfColumns()
 	return 	Column.size();
 }
 
+int Matrix::GetCountofRows()
+{
+	
+	return (*Column.begin()).second.size();
+}
+
 bool Matrix::IssetRow(int Number)
 {
 	mapintmap it;
@@ -159,5 +165,12 @@ bool Matrix::IssetColumn(int Number)
 	}
 	return false;
 }
+
+const int& Matrix::operator()(int& Row, int& Column)
+{
+	return (*(*this->Column.find(Row - 1)).second.find(Column - 1)).second;
+}
+
+
 
 

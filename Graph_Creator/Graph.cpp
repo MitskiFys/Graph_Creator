@@ -9,7 +9,6 @@ Graph::Graph(int Number)
 {
 	for (int i = 0; i < Number; i++) {
 		AdjacencyMatrix.AddNode();
-		IncidenceMatrix.AddColumn();
 	}
 }
 
@@ -56,7 +55,17 @@ void Graph::AddBidirectionalEdge(int FirstNode, int SecondNode, int Length)
 
 void Graph::DeleteEdge(int Number)
 {
-		
+	int FirstNode = 0;
+	int SecondNode = 0;
+
+	for (int i = 1; i <= IncidenceMatrix.GetCountofRows();i++) {
+		if (IncidenceMatrix(Number, i) != 0) {
+			FirstNode = SecondNode;
+			SecondNode = i;
+		}
+	}
+	IncidenceMatrix.DeleteRow(Number);
+	AdjacencyMatrix.AddBidirectionalEdge(FirstNode, SecondNode, 0);
 }
 
 void Graph::GetAdjacencyMatrix()
