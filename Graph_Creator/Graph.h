@@ -20,10 +20,16 @@ class Graph
 private:
     Matrix AdjacencyMatrix;//Матрица смежности
     Matrix IncidenceMatrix;//Матрица инцидентности
-    vector <int> ShortestWay;//Кротчайший путь
-    vector <int> Length;//Расстояние
+    map <int,int> ShortestWay;//Кротчайший путь
+    map <int,int> Length;//Расстояние
     int CountOfNods = 0;//Количество вершин
     string AddedNods = "";//Список добавленных вершин
+    list <int> Visited;
+    int start;
+    int predposledniy;
+    void DFC(int,map<int,bool>, map<int,int>, string);
+    string CyrcleStack;
+    int CountOfCyrcle=0;
 public:
     QStringList Headers;//Оглавления
     Graph();//Граф с неизвестным количеством вершин(задается далее)
@@ -43,5 +49,10 @@ public:
     void RunAlgoDijkstra(int);//Запустить алгоритм Дейкстры с вершины
     bool IsEdgeBiDirectional(int,int,int);//Проверить на двунапревленность ребро
     int GetIndexFromHeader(int);//Получить индекс оглавления
+    int GetShortestWayTo(int);
+    bool CheckShortestWayToValue(int);
+
+
+    int GetCountOfCycle();
 };
 #endif // GRAPH_H

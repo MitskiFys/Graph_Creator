@@ -18,14 +18,16 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     Graph MyGraph;
-
+    int Cache = 0;
 private slots:
-
-    void on_AddColumn_clicked();
     void OnCellChangeds(int);
     void OnCellUpdate();
-
+    void ShortestWay();
     void on_pushButton_clicked();
+
+    void on_AddNode_clicked();
+
+    void on_Cycles_clicked();
 
 private:
     Ui::MainWindow *ui;

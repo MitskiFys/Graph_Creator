@@ -22,16 +22,18 @@ void Graph::AddNode()
 void Graph::DeleteNode(int Number)
 {
     //AdjacencyMatrix.DrawMatrix();
-    AdjacencyMatrix.DeleteNode(Number);
     vector <int> NumberToDelete;
     for (int i = IncidenceMatrix.GetFirstIndexRow(); i <=IncidenceMatrix.GetLastIndexRow()+1;i++){
         if ((IncidenceMatrix.IssetRow(i))&&(IncidenceMatrix(i,Number)!=0)) {
             NumberToDelete.push_back(i);//5,6,10,14,
         }
     }
-    for (vector <int>::iterator iter = NumberToDelete.begin(); iter!=NumberToDelete.end();iter++){
-        IncidenceMatrix.DeleteRow(*iter);
-    }
+    //for (vector <int>::iterator iter = NumberToDelete.begin(); iter!=NumberToDelete.end();iter++){
+    for (auto iter: NumberToDelete){
+        cout << IncidenceMatrix.IssetRow(3);
+        DeleteEdge(iter);
+    }//Проверить удаления из списка
+    AdjacencyMatrix.DeleteNode(Number);
     IncidenceMatrix.DeleteColumn(Number);
     IncidenceMatrix.DrawMatrix();
 }
@@ -65,7 +67,7 @@ void Graph::AddBidirectionalEdge(int FirstNode, int SecondNode, int Length)
     if (Length != 0){
         if (IncidenceMatrix.GetCountOfRows() == 0) {
             for (int i = AdjacencyMatrix.GetFirstIndexRow(); i <= AdjacencyMatrix.GetLastIndexRow(); i++) {
-                IncidenceMatrix.AddColumn();
+                IncidenceMatrix.AddColumn(i);
             }
         }
         else {
@@ -85,19 +87,23 @@ void Graph::DeleteEdge(int Number)
 {
     int FirstNode = 0;
     int SecondNode = 0;
-
-    for (int i = 1; i <= IncidenceMatrix.GetCountOfColumns();i++) {
-        if (IncidenceMatrix(Number, i) != 0) {
-            FirstNode = SecondNode;
-            SecondNode = i;
-        }
+    cout << IncidenceMatrix.IssetRow(3);
+    for (int i = IncidenceMatrix.GetFirstIndexColumn(); i <= IncidenceMatrix.GetLastIndexColumn();i++) {
+        if (IncidenceMatrix.IssetColumn(i))
+            if (IncidenceMatrix(Number, i) != 0) {
+                FirstNode = SecondNode;
+                SecondNode = i;
+            }
     }
+
     if (FirstNode==0)
         FirstNode = SecondNode;
+
+    AdjacencyMatrix.AddBidirectionalEdge(FirstNode, SecondNode, 0);
+
     string Nods =to_string(FirstNode) + "with" + to_string(SecondNode)+"-"+to_string(Number)+"-";
 
     IncidenceMatrix.DeleteRow(Number);
-    AdjacencyMatrix.AddBidirectionalEdge(FirstNode, SecondNode, 0);
     if (AddedNods.find(Nods)!= std::string::npos){
         AddedNods.erase(AddedNods.find(Nods),Nods.size());
     }else {
@@ -126,7 +132,11 @@ void Graph::GetDotFile()
     int SecondNode = 0;
     int Direction = 1;
     outfile << "digraph graphname {"<< endl;
-
+    cout << "------------------"<< endl;
+    GetAdjacencyMatrix();
+    cout << endl;
+    GetIncidenceMatrix();
+    cout << "------------------"<< endl;
     for (int i = AdjacencyMatrix.GetFirstIndexRow(); i<= AdjacencyMatrix.GetLastIndexRow();i++){
         if (AdjacencyMatrix.IssetRow(i)){
             outfile << i << ';' << endl;
@@ -134,6 +144,60 @@ void Graph::GetDotFile()
     }
 
     if (IncidenceMatrix.GetCountOfColumns()!=0){
+        for (int i = IncidenceMatrix.GetFirstIndexRow(); i <= IncidenceMatrix.GetLastIndexRow(); i++){
+            if (IncidenceMatrix.IssetRow(i)){
+                for (int j = IncidenceMatrix.GetFirstIndexColumn(); j<= IncidenceMatrix.GetLastIndexColumn();j++){
+                    if (IncidenceMatrix(i,j)==1){
+                        FirtsNode = j;
+                        Direction *= IncidenceMatrix(i,j);
+                    } else if (IncidenceMatrix(i,j)==-1){
+                        if (FirtsNode == 0)
+                            FirtsNode = SecondNode;
+                        SecondNode = j;
+                        Direction *= IncidenceMatrix(i,j);
+                    }
+                }
+                if (FirtsNode == 0){
+                    FirtsNode = SecondNode;
+                    Direction*=-1;
+                }
+                outfile << FirtsNode;
+                if (Direction < 0) {
+                    outfile << "->"<< SecondNode <<"[label = "<<AdjacencyMatrix(FirtsNode,SecondNode)<<"]"<< endl;
+                } else {
+                    outfile << "->"<< SecondNode <<"[dir=\"both\",label ="<<AdjacencyMatrix(FirtsNode,SecondNode)<<"]"<< endl;
+                }
+                FirtsNode =0;
+                SecondNode = 0;
+                Direction = 1;
+            }
+
+        }
+    }
+    outfile <<"}"<<endl;
+
+    outfile.close();
+}
+
+void Graph::GetDotFile(int From = 0, int To = 0)
+{
+    std::ofstream outfile ("graph.dot");
+    int FirtsNode = 0;
+    int SecondNode = 0;
+    int Direction = 1;
+    outfile << "digraph graphname {"<< endl;
+    map <int, int> Way;
+
+    if (CheckShortestWayToValue(To))
+        while (From != To){
+            Way.insert(make_pair(To,ShortestWay[To]));
+            To = ShortestWay[To];
+        }
+    for (int i = AdjacencyMatrix.GetFirstIndexRow(); i<= AdjacencyMatrix.GetLastIndexRow();i++){
+        if (AdjacencyMatrix.IssetRow(i)){
+            outfile << i << ';' << endl;
+        }
+    }
     for (int i = IncidenceMatrix.GetFirstIndexRow(); i <= IncidenceMatrix.GetLastIndexRow(); i++){
         if (IncidenceMatrix.IssetRow(i)){
             for (int j = IncidenceMatrix.GetFirstIndexColumn(); j<= IncidenceMatrix.GetLastIndexColumn();j++){
@@ -151,66 +215,13 @@ void Graph::GetDotFile()
                 FirtsNode = SecondNode;
                 Direction*=-1;
             }
-            outfile << FirtsNode;
-            if (Direction < 0) {
-                outfile << "->"<< SecondNode <<"[label = "<<AdjacencyMatrix(FirtsNode,SecondNode)<<"]"<< endl;
-            } else {
-                outfile << "->"<< SecondNode <<"[dir=\"both\",label ="<<AdjacencyMatrix(FirtsNode,SecondNode)<<"]"<< endl;
-            }
-            FirtsNode =0;
-            SecondNode = 0;
-            Direction = 1;
-        }
-
-    }
-}
-    outfile <<"}"<<endl;
-
-    outfile.close();
-}
-
-void Graph::GetDotFile(int From, int To)
-{
-    RunAlgoDijkstra(From);
-    From--;
-    To--;
-    std::ofstream outfile ("graph.dot");
-    int FirtsNode = 0;
-    int SecondNode = 0;
-    int Direction = 1;
-    outfile << "digraph graphname {"<< endl;
-    map <int, int> Way;
-
-    while (From != To){
-        Way.insert(make_pair((To+1),(ShortestWay[To]+1)));
-        To = ShortestWay[To];
-    }
-    for (int i = AdjacencyMatrix.GetFirstIndexRow(); i<= AdjacencyMatrix.GetLastIndexRow();i++){
-        if (AdjacencyMatrix.IssetRow(i)){
-            outfile << i << ';' << endl;
-        }
-    }
-    for (int i = IncidenceMatrix.GetFirstIndexRow(); i <= IncidenceMatrix.GetLastIndexRow(); i++){
-        if (IncidenceMatrix.IssetRow(i)){
-            for (int j = IncidenceMatrix.GetFirstIndexColumn(); j<= IncidenceMatrix.GetLastIndexColumn();j++){
-                if (IncidenceMatrix(i,j)==1){
-                    FirtsNode = j;
-                    Direction *= IncidenceMatrix(i,j);
-                } else if (IncidenceMatrix(i,j)==-1){
-                    if (FirtsNode == 0)
-                        FirtsNode = SecondNode;
-                    SecondNode = j;
-                    Direction *= IncidenceMatrix(i,j);
-                }
-            }
-            string find;
-            find = to_string(FirtsNode) + " " + to_string(SecondNode);
-            if (!((FirtsNode<=Way.size())&&((Way[(SecondNode)]==(FirtsNode))||((Direction > 0)&&((Way[(FirtsNode)]==(SecondNode))))))){
+            //cout << Way[SecondNode] << endl;
+            if (!(((Way.find(SecondNode)!=Way.end())&&(Way[SecondNode]==FirtsNode)))){
                 outfile << FirtsNode;
                 if (Direction < 0) {
-                    outfile << "->"<< SecondNode << endl;
+                    outfile << "->"<< SecondNode <<"[label = "<<AdjacencyMatrix(FirtsNode,SecondNode)<<"]"<< endl;
                 } else {
-                    outfile << "->"<< SecondNode <<"[dir=\"both\"]"<< endl;
+                    outfile << "->"<< SecondNode <<"[dir=\"both\",label ="<<AdjacencyMatrix(FirtsNode,SecondNode)<<"]"<< endl;
                 }
                 FirtsNode =0;
                 SecondNode = 0;
@@ -218,9 +229,9 @@ void Graph::GetDotFile(int From, int To)
             } else {
                 outfile << FirtsNode;
                 if (Direction < 0) {
-                    outfile << "->"<< SecondNode <<" [color = Red]"<< endl;
+                    outfile << "->"<< SecondNode <<" [color = Red"<<",label = "<<AdjacencyMatrix(FirtsNode,SecondNode)<<"]"<< endl;
                 } else {
-                    outfile << "->"<< SecondNode <<"[dir=\"both\", color = Red]"<< endl;
+                    outfile << "->"<< SecondNode <<"[dir=\"both\", color = Red, label ="<<AdjacencyMatrix(FirtsNode,SecondNode)<<"]"<< endl;
                 }
                 FirtsNode =0;
                 SecondNode = 0;
@@ -265,62 +276,50 @@ void Graph::DeleteHeader(int Node)
 
 void Graph::RunAlgoDijkstra(int From)
 {
-    int size = AdjacencyMatrix.GetCountOfColumns();
-    int* Headers = new int[size];
-    int** ptrarray = new int* [size];
+    if (GetIndexFromHeader(From)==-1){
+        ShortestWay.clear();
+        Length.clear();
+        return;
+    }
+    int size = AdjacencyMatrix.GetLastIndexColumn();
     vector <int> CheckedArray;
     int ActiveNode;
     int i1 = 0;
     int j1 = 0;
-    From--;
-    for (int count = 0; count < size; count++)
-        ptrarray[count] = new int [size];
-    for (int i = AdjacencyMatrix.GetFirstIndexRow(); i<= AdjacencyMatrix.GetLastIndexRow(); i++){
-        if (AdjacencyMatrix.IssetRow(i))
-        {
-            Headers[i1]=i;
-            for (int j = AdjacencyMatrix.GetFirstIndexColumn(); j <= AdjacencyMatrix.GetLastIndexColumn(); j++){
-                ptrarray[i1][j1]=AdjacencyMatrix(i,j);
-                j1++;
-            }
-            j1=0;
-            i1++;
+    Length.clear();
+    ShortestWay.clear();
+
+    for (int i = AdjacencyMatrix.GetFirstIndexColumn(); i<= size; i++){
+        if (AdjacencyMatrix.IssetColumn(i)){
+            Length.insert(make_pair(i,0));
+            ShortestWay.insert(make_pair(i,0));
         }
-    }
-    for (int i = 0; i < size; i++){
-        Length.push_back(0);
-        ShortestWay.push_back(From);
     }
     int minLength = 0;
     int minNode = 0;
     CheckedArray.push_back(From);
     ActiveNode = From;
     int ActiveLength = 0;
-    for (int i = 0; i < size; i++){
-        for (int j = 0; j < size; j++){
-            //cout << (find(CheckedArray.begin(),CheckedArray.end(),j)!= CheckedArray.end()) << endl;
-            //cout << ptrarray[ActiveNode][j] << endl;
-            if (((!(find(CheckedArray.begin(),CheckedArray.end(),j)!= CheckedArray.end()))&&(((ActiveLength+ptrarray[ActiveNode][j])<Length[j])||(Length[j]==0)))&&(ptrarray[ActiveNode][j]!=0)){
-                Length[j]=ActiveLength+ptrarray[ActiveNode][j];
-                ShortestWay[j] = ActiveNode;
-
+    for (int i = AdjacencyMatrix.GetFirstIndexRow(); i < AdjacencyMatrix.GetLastIndexRow(); i++){
+        if (AdjacencyMatrix.IssetColumn(i))
+            for (int j = AdjacencyMatrix.GetFirstIndexColumn(); j <= size; j++){
+                if (((!(find(CheckedArray.begin(),CheckedArray.end(),j)!= CheckedArray.end()))&&(((ActiveLength+(AdjacencyMatrix(ActiveNode,j)))<Length[j])||(Length[j]==0)))&&(AdjacencyMatrix(ActiveNode,j)!=0)){
+                    Length[j]=ActiveLength+AdjacencyMatrix(ActiveNode,j);
+                    ShortestWay[j] = ActiveNode;
+                }
             }
-        }
-        int key = 0;
         minLength = 0;
-        for (auto len : Length){
-            if (((minLength == 0)||(len < minLength))&&(len!=0)&&(!(find(CheckedArray.begin(),CheckedArray.end(),key)!= CheckedArray.end()))){
-                minLength = len;
-                minNode = key;
-                key++;
-            } else {
-                key++;
+        for (map<int,int>::iterator len = Length.begin(); len !=Length.end();len++){
+            if (((minLength == 0)||(len->second < minLength))&&(len->second!=0)&&(!(find(CheckedArray.begin(),CheckedArray.end(),len->first)!= CheckedArray.end()))){
+                minLength = len->second;
+                minNode = len->first;
             }
         }
         ActiveNode = minNode;
         CheckedArray.push_back(ActiveNode);
         ActiveLength = minLength;
     }
+    cout << endl;
 }
 
 bool Graph::IsEdgeBiDirectional(int Edge, int FirstNode, int SecondNode)
@@ -337,9 +336,91 @@ bool Graph::IsEdgeBiDirectional(int Edge, int FirstNode, int SecondNode)
 
 int Graph::GetIndexFromHeader(int Header)
 {
-    for (int i=0;i<Headers.count()-1;i++){
-        if (Headers[i]==Header)
+    for (int i=0;i<Headers.count();i++){
+        if (Headers[i].toInt()==Header)
             return i;
     }
     return -1;
 }
+
+int Graph::GetShortestWayTo(int Node)
+{
+    return Length[Node];
+}
+
+bool Graph::CheckShortestWayToValue(int Node)
+{
+    if (ShortestWay[Node]!=0)
+        return true;
+    return false;
+}
+
+void Graph::DFC(int Node, map <int,bool> Visited, map <int,int> Colors, string way)
+{
+
+    Visited[Node] = true;
+
+    //    for (int i = AdjacencyMatrix.GetFirstIndexColumn(); i<=AdjacencyMatrix.GetLastIndexColumn();i++){
+    //        if ((AdjacencyMatrix.IssetColumn(i))and(i!=Node)and(AdjacencyMatrix(Node,i)!=0)and(i!=start)and(predposledniy < Node))
+    //            Visited[i]=false;
+    //    }
+
+    for (int i = AdjacencyMatrix.GetFirstIndexColumn(); i<= AdjacencyMatrix.GetLastIndexColumn(); i++){
+        if ((AdjacencyMatrix.IssetColumn(i))and(AdjacencyMatrix(Node,i)!=0)and(Colors[i]==1)and(predposledniy!=i) ){
+            cout << "Cyrcle"<< endl;
+            //if (!CyrcleStack.find(way+'\n'));
+            CountOfCyrcle++;
+            CyrcleStack += way+"->"+to_string(i)+'\n';
+        }
+        if ((AdjacencyMatrix.IssetColumn(i))and(AdjacencyMatrix(Node,i)!=0)and(Visited[i]==false)and(Colors[i]!=2)and(predposledniy!=i) ){
+            predposledniy = Node;
+            DFC(i,Visited,Colors,way+"->"+to_string(i));
+            Colors[i]=2;
+        }
+    }
+
+}
+
+
+int Graph::GetCountOfCycle()
+{
+    map <int,int> Colors;
+    map <int, bool> Visited;
+    string way;
+    //0- white
+    //1- grey
+    //2- black
+    //    start = 1;
+    //    predposledniy = 1;
+    CyrcleStack = "";
+    CountOfCyrcle = 0;
+    for (int i = AdjacencyMatrix.GetFirstIndexColumn(); i<= AdjacencyMatrix.GetLastIndexColumn(); i++){
+        AdjacencyMatrix.IssetColumn(i);{
+            Colors.insert(make_pair(i,0));
+            Visited.insert(make_pair(i,false));
+        }
+    }
+
+    for (int i = AdjacencyMatrix.GetFirstIndexColumn(); i<= AdjacencyMatrix.GetLastIndexColumn(); i++){
+        AdjacencyMatrix.IssetColumn(i);{
+            start = i;
+            predposledniy = i;
+            way = to_string(i);
+            Colors[i] = 1;
+            DFC(i,Visited,Colors,way);
+            Colors[i] = 2;
+        }
+    }
+
+
+    cout << CyrcleStack << endl;
+    return CountOfCyrcle;
+}
+
+
+
+
+
+
+
+

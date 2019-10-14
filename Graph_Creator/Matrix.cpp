@@ -117,7 +117,8 @@ void Matrix::DeleteColumn(int Number)
 
 void Matrix::DeleteRow(int Number)
 {
-    MyMatrix.erase(MyMatrix.find(Number-1));
+    int n = (MyMatrix.find(Number-1))->first;
+    MyMatrix.erase(n);
 }
 
 void Matrix::DrawMatrix()
