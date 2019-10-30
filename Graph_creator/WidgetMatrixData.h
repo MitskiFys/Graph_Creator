@@ -9,7 +9,6 @@
 #include <qpushbutton.h>
 #include "Graph.h"
 #include <QtSvg/QSvgWidget>
-#include "WidgetShowImage.h"
 class InputMatrixData : public QWidget
 {
     Q_OBJECT
@@ -19,12 +18,16 @@ private:
     QPushButton  *AddNode;
     QPushButton  *DeleteNode;
     QComboBox    *ActiveNodes;
+    QLabel       *Image;
     QPushButton  *createButton(const QString str);
     Graph MyGraph;
+    void SetImage();
 public:
     InputMatrixData(QWidget* pwgt = nullptr);
-private slots:
+signals:
 
+private slots:
+    void slotAddNode();
 };
 
 #endif // INPUTMATRIXDATA_H

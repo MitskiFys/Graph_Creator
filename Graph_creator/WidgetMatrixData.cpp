@@ -13,12 +13,11 @@ InputMatrixData::InputMatrixData(QWidget *pwgt) : QWidget(pwgt)
     QGroupBox *imageGroup = new QGroupBox("Graph");
     QVBoxLayout *imageBox = new QVBoxLayout;
 
-    QLabel *lbl = new QLabel;
-    QPixmap pix("graph.svg");
-    lbl->setPixmap(pix);
+    Image = new QLabel;
+    SetImage();
 
-    imageBox->addWidget(lbl);
-    imageBox->setAlignment(lbl,Qt::AlignCenter);
+    imageBox->addWidget(Image);
+    imageBox->setAlignment(Image,Qt::AlignCenter);
     imageGroup->setLayout(imageBox);
     imageGroup->setMinimumSize(320,240);
 
@@ -90,4 +89,50 @@ InputMatrixData::InputMatrixData(QWidget *pwgt) : QWidget(pwgt)
     MainArea->addItem(functionalArea);
 
     setLayout(MainArea);
+
+    //connect setup
+
+    connect(AddNode, SIGNAL(clicked()),SLOT(slotAddNode()));
+}
+
+void InputMatrixData::slotAddNode()
+{
+    MyGraph.AddNode();
+    MyGraph.AddHeader(MyGraph.Headers[((MyGraph.Headers.count())-1)].toInt()+1);
+
+    //AdjacencyMatrix setup
+
+    AdjacencyMatrix->insertRow(AdjacencyMatrix->rowCount());
+    AdjacencyMatrix->insertColumn(AdjacencyMatrix->columnCount());
+    AdjacencyMatrix->setHorizontalHeaderLabels(MyGraph.Headers);
+    AdjacencyMatrix->setVerticalHeaderLabels(MyGraph.Headers);
+
+    //IncidenceMatrix setup
+
+    IncidenceMatrix->insertColumn(IncidenceMatrix->columnCount());
+    IncidenceMatrix->setHorizontalHeaderLabels(MyGraph.Headers);
+
+
+//    if ((ui->FirstNode->text()!= NULL)&&(ui->SecondNode->text()!=0)){
+//        MyGraph.RunAlgoDijkstra(ui->FirstNode->text().toInt());
+//        if ((MyGraph.GetShortestWayTo(ui->SecondNode->text().toInt())==0)and(ui->FirstNode->text().toInt()!=ui->SecondNode->text().toInt()))
+//            ui->Length->setText("No way");
+//        else
+//            ui->Length->setText(QString::number(MyGraph.GetShortestWayTo(ui->SecondNode->text().toInt())));        MyGraph.GetDotFile(ui->FirstNode->text().toInt(),ui->SecondNode->text().toInt());
+//    }else
+//        MyGraph.GetDotFile();
+//    MyGraph.saveImageGV();
+//    QPixmap pix("graph.svg");
+//    cout << "add"<< endl;
+//    ui->label->setPixmap(pix.scaled(301,441,Qt::KeepAspectRatio));
+    SetImage();
+    cout << "Slot is worked" << endl;
+}
+
+void InputMatrixData::SetImage()
+{
+    MyGraph.GetDotFile();
+    MyGraph.saveImageGV();
+    QPixmap pixmap("graph.svg");
+    Image->setPixmap(pixmap);
 }
