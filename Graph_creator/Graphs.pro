@@ -17,19 +17,16 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     Graph.cpp \
+    ImageCreator.cpp \
     Matrix.cpp \
     WidgetMatrixData.cpp \
     main.cpp \
-    mainwindow.cpp
 
 HEADERS += \
     Graph.h \
+    ImageCreator.h \
     Matrix.h \
     WidgetMatrixData.h \
-    mainwindow.h
-
-FORMS += \
-    mainwindow.ui
 
 
 LIBS += -lgvc -lcgraph -lcdt

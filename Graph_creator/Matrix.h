@@ -23,7 +23,7 @@ public:
 
     void AddDirectionalEdge(int, int, int);//Добавить направленное ребро (начало, конец, длина)
     void AddBidirectionalEdge(int, int, int);//Добавить двунаправленное
-    const int GetDistanceBetweenNods(int, int);//Получить расстояние между вершинами
+    int GetDistanceBetweenNods(int, int);//Получить расстояние между вершинами
     void AddNode();//Добавить вершину
     void AddColumn();// Добавить колонку
     void AddColumn(int);
@@ -40,7 +40,7 @@ public:
     int GetCountOfColumns();//Получить количество колонок
     bool IssetRow(int);// Проверить на существование строки
     bool IssetColumn(int);// Проверить на существование колонки
-
+    void SetCell(int, int, int);
 
     const int& operator()(int&, int&);
 };

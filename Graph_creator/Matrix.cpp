@@ -41,7 +41,7 @@ void Matrix::AddBidirectionalEdge(int FirstNode, int SecondNode, int Length)
     AddDirectionalEdge(SecondNode, FirstNode, Length);
 }
 
-const int Matrix::GetDistanceBetweenNods(int FirstNode, int SecondNode)
+int Matrix::GetDistanceBetweenNods(int FirstNode, int SecondNode)
 {
     return (*(*MyMatrix.find(FirstNode - 1)).second.find(SecondNode - 1)).second;
 }
@@ -199,6 +199,11 @@ bool Matrix::IssetColumn(int Number)
         return true;
     }
     return false;
+}
+
+void Matrix::SetCell(int Column, int Row, int Value)
+{
+    (*(*this->MyMatrix.find(Row - 1)).second.find(Column - 1)).second = Value;
 }
 
 const int& Matrix::operator()(int& Row, int& Column)

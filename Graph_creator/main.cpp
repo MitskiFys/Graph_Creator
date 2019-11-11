@@ -1,4 +1,3 @@
-#include "MyView.h"
 #include "mainwindow.h"
 #include <QApplication>
 #include <QGraphicsScene>

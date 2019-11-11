@@ -31,7 +31,7 @@ void Graph::DeleteNode(int Number)
     }
     //for (vector <int>::iterator iter = NumberToDelete.begin(); iter!=NumberToDelete.end();iter++){
     for (auto iter: NumberToDelete){
-        cout << IncidenceMatrix.IssetRow(3);
+        //cout << IncidenceMatrix.IssetRow(3);
         DeleteEdge(iter);
     }//Проверить удаления из списка
     AdjacencyMatrix.DeleteNode(Number);
@@ -84,11 +84,21 @@ void Graph::AddBidirectionalEdge(int FirstNode, int SecondNode, int Length)
     }
 }
 
+void Graph::AddEdge()
+{
+    if (IncidenceMatrix.GetCountOfRows() == 0) {
+        for (int i = AdjacencyMatrix.GetFirstIndexRow(); i <= AdjacencyMatrix.GetLastIndexRow(); i++) {
+            IncidenceMatrix.AddColumn(i);
+        }
+    } else
+        IncidenceMatrix.AddRow();
+}
+
 void Graph::DeleteEdge(int Number)
 {
     int FirstNode = 0;
     int SecondNode = 0;
-    cout << IncidenceMatrix.IssetRow(3);
+    //cout << IncidenceMatrix.IssetRow(3);
     for (int i = IncidenceMatrix.GetFirstIndexColumn(); i <= IncidenceMatrix.GetLastIndexColumn();i++) {
         if (IncidenceMatrix.IssetColumn(i))
             if (IncidenceMatrix(Number, i) != 0) {
@@ -125,61 +135,63 @@ void Graph::GetIncidenceMatrix()
     IncidenceMatrix.DrawMatrix();
 }
 
-void Graph::GetDotFile()
-{
+//void Graph::CreateDotFile()
+//{
 
-//    std::ofstream outfile ("graph.dot");
-    DotFile = "";
-    int FirtsNode = 0;
-    int SecondNode = 0;
-    int Direction = 1;
-    DotFile += "digraph graphname {\n";
-//    cout << "------------------"<< endl;
-//    GetAdjacencyMatrix();
-//    cout << endl;
-//    GetIncidenceMatrix();
-//    cout << "------------------"<< endl;
-    for (int i = AdjacencyMatrix.GetFirstIndexRow(); i<= AdjacencyMatrix.GetLastIndexRow();i++){
-        if (AdjacencyMatrix.IssetRow(i)){
-            DotFile += to_string(i) + ";\n";
-        }
-    }
+//    //    std::ofstream outfile ("graph.dot");
+//    DotFile = "";
+//    int FirtsNode = 0;
+//    int SecondNode = 0;
+//    int Direction = 1;
+//    DotFile += "digraph graphname {\n";
+//    //    cout << "------------------"<< endl;
+//    //    GetAdjacencyMatrix();
+//    //    cout << endl;
+//    //    GetIncidenceMatrix();
+//    //    cout << "------------------"<< endl;
+//    for (int i = AdjacencyMatrix.GetFirstIndexRow(); i<= AdjacencyMatrix.GetLastIndexRow();i++){
+//        if (AdjacencyMatrix.IssetRow(i)){
+//            DotFile += to_string(i) + ";\n";
+//        }
+//    }
 
-    if (IncidenceMatrix.GetCountOfColumns()!=0){
-        for (int i = IncidenceMatrix.GetFirstIndexRow(); i <= IncidenceMatrix.GetLastIndexRow(); i++){
-            if (IncidenceMatrix.IssetRow(i)){
-                for (int j = IncidenceMatrix.GetFirstIndexColumn(); j<= IncidenceMatrix.GetLastIndexColumn();j++){
-                    if (IncidenceMatrix(i,j)==1){
-                        FirtsNode = j;
-                        Direction *= IncidenceMatrix(i,j);
-                    } else if (IncidenceMatrix(i,j)==-1){
-                        if (FirtsNode == 0)
-                            FirtsNode = SecondNode;
-                        SecondNode = j;
-                        Direction *= IncidenceMatrix(i,j);
-                    }
-                }
-                if (FirtsNode == 0){
-                    FirtsNode = SecondNode;
-                    Direction*=-1;
-                }
-                DotFile += to_string(FirtsNode);
-                if (Direction < 0) {
-                    DotFile += "->" + to_string(SecondNode) + "[label = " + to_string(AdjacencyMatrix(FirtsNode,SecondNode)) + "]\n";
-                } else {
-                    DotFile += "->" + to_string(SecondNode) + "[dir=\"both\",label =" + to_string(AdjacencyMatrix(FirtsNode,SecondNode)) + "]\n";
-                }
-                FirtsNode =0;
-                SecondNode = 0;
-                Direction = 1;
-            }
+//    if (IncidenceMatrix.GetCountOfColumns()!=0){
+//        for (int i = IncidenceMatrix.GetFirstIndexRow(); i <= IncidenceMatrix.GetLastIndexRow(); i++){
+//            if (IncidenceMatrix.IssetRow(i)){
+//                for (int j = IncidenceMatrix.GetFirstIndexColumn(); j<= IncidenceMatrix.GetLastIndexColumn();j++){
+//                    if (IncidenceMatrix(i,j)==1){
+//                        FirtsNode = j;
+//                        Direction *= IncidenceMatrix(i,j);
+//                    } else if (IncidenceMatrix(i,j)==-1){
+//                        if (FirtsNode == 0)
+//                            FirtsNode = SecondNode;
+//                        SecondNode = j;
+//                        Direction *= IncidenceMatrix(i,j);
+//                    }
+//                }
+//                if ((FirtsNode == 0)&&(FirtsNode == SecondNode))
+//                    continue;
+//                if (FirtsNode == 0){
+//                    FirtsNode = SecondNode;
+//                    Direction*=-1;
+//                }
+//                DotFile += to_string(FirtsNode);
+//                if (Direction < 0) {
+//                    DotFile += "->" + to_string(SecondNode) + "[label = " + to_string(AdjacencyMatrix(FirtsNode,SecondNode)) + "]\n";
+//                } else {
+//                    DotFile += "->" + to_string(SecondNode) + "[dir=\"both\",label =" + to_string(AdjacencyMatrix(FirtsNode,SecondNode)) + "]\n";
+//                }
+//                FirtsNode =0;
+//                SecondNode = 0;
+//                Direction = 1;
+//            }
 
-        }
-    }
-    DotFile += "}\n";
-}
+//        }
+//    }
+//    DotFile += "}\n";
+//}
 
-void Graph::GetDotFile(int From = 0, int To = 0)
+void Graph::CreateDotFile(int From , int To)
 {
     DotFile = "";
     //std::ofstream outfile ("graph.dot");
@@ -188,7 +200,7 @@ void Graph::GetDotFile(int From = 0, int To = 0)
     int Direction = 1;
     DotFile += "digraph graphname {\n";
     map <int, int> Way;
-
+    if ((From != 0)&&(To != 0))
     if (CheckShortestWayToValue(To))
         while (From != To){
             Way.insert(make_pair(To,ShortestWay[To]));
@@ -212,6 +224,8 @@ void Graph::GetDotFile(int From = 0, int To = 0)
                     Direction *= IncidenceMatrix(i,j);
                 }
             }
+            if ((FirtsNode == 0)&&(FirtsNode == SecondNode))
+                continue;
             if (FirtsNode == 0){
                 FirtsNode = SecondNode;
                 Direction*=-1;
@@ -264,13 +278,13 @@ int Graph::GetEdgeIndex(int FirstNode, int SecondNode)
 void Graph::AddHeader(int Node)
 {
     QString Number = QString::number(Node);
-    Headers << Number;
+    NodeHeaders << Number;
 }
 
 void Graph::DeleteHeader(int Node)
 {
     QString Number =QString::number(Node);
-    Headers.removeOne(Number);
+    NodeHeaders.removeOne(Number);
 }
 
 void Graph::RunAlgoDijkstra(int From)
@@ -318,7 +332,6 @@ void Graph::RunAlgoDijkstra(int From)
         CheckedArray.push_back(ActiveNode);
         ActiveLength = minLength;
     }
-    cout << endl;
 }
 
 bool Graph::IsEdgeBiDirectional(int Edge, int FirstNode, int SecondNode)
@@ -335,8 +348,8 @@ bool Graph::IsEdgeBiDirectional(int Edge, int FirstNode, int SecondNode)
 
 int Graph::GetIndexFromHeader(int Header)
 {
-    for (int i=0;i<Headers.count();i++){
-        if (Headers[i].toInt()==Header)
+    for (int i=0;i<NodeHeaders.count();i++){
+        if (NodeHeaders[i].toInt()==Header)
             return i;
     }
     return -1;
@@ -354,6 +367,37 @@ bool Graph::CheckShortestWayToValue(int Node)
     return false;
 }
 
+int Graph::GetCountColumnIncMat()
+{
+    return IncidenceMatrix.GetCountOfColumns();
+}
+
+int Graph::GetCountRowIncMat()
+{
+    return IncidenceMatrix.GetCountOfRows();
+}
+
+QStringList Graph::GetDataFromIncMat()
+{
+    QStringList data;
+    int RowCount = -1;
+    for (int i = IncidenceMatrix.GetFirstIndexRow(); i!= IncidenceMatrix.GetLastIndexRow()+1; i++){
+        if (IncidenceMatrix.IssetRow(i)){
+            RowCount++;
+            for (int j = IncidenceMatrix.GetFirstIndexColumn(); j!= IncidenceMatrix.GetLastIndexColumn()+1; j++){
+                if (IncidenceMatrix.IssetColumn(j)){
+                    if(IncidenceMatrix(i,j)!=0){
+                        data.push_back(QString::number(RowCount));
+                        data.push_back(QString::number(GetIndexFromHeader(j)));
+                        data.push_back(QString::number(IncidenceMatrix(i,j)));
+                    }
+                }
+            }
+        }
+    }
+    return data;
+}
+
 void Graph::DFC(int Node, map <int,bool> Visited, map <int,int> Colors, string way)
 {
 
@@ -366,7 +410,7 @@ void Graph::DFC(int Node, map <int,bool> Visited, map <int,int> Colors, string w
 
     for (int i = AdjacencyMatrix.GetFirstIndexColumn(); i<= AdjacencyMatrix.GetLastIndexColumn(); i++){
         if ((AdjacencyMatrix.IssetColumn(i))and(AdjacencyMatrix(Node,i)!=0)and(Colors[i]==1)and(predposledniy!=i) ){
-            cout << "Cyrcle"<< endl;
+            //cout << "Cyrcle"<< endl;
             //if (!CyrcleStack.find(way+'\n'));
             CountOfCyrcle++;
             CyrcleStack += way+"->"+to_string(i)+'\n';
@@ -412,45 +456,28 @@ int Graph::GetCountOfCycle()
     }
 
 
-    cout << CyrcleStack << endl;
+    //cout << CyrcleStack << endl;
     return CountOfCyrcle;
 }
 
-bool Graph::saveImageGV(){
-    GVC_t *gvc;
-    Agraph_t *g;
-    gvc = gvContext();
-    char cstr[DotFile.size()+1];
-    strcpy(cstr, DotFile.c_str());
-    g = agmemread(cstr);
-    gvLayout(gvc, g, "dot");
-    string FileName = "graph.svg";
-    gvRender(gvc, g, "svg", fopen((FileName).c_str(), "w"));
-    //QThread::sleep();
-    gvFreeLayout(gvc, g);
-    return (gvFreeContext(gvc));
-}
-
-bool Graph::saveImageGV(string Way)
+QStringList Graph::GetCurrentNods()
 {
+    QStringList Nods;
 
-    GVC_t *gvc;
-    Agraph_t *g;
-    gvc = gvContext();
-    char cstr[DotFile.size()+1];
-    strcpy(cstr, DotFile.c_str());
-    g = agmemread(cstr);
-    gvLayout(gvc, g, "dot");
-    string FileName = "graph.svg";
-    gvRender(gvc, g, "svg", fopen((Way).c_str(), "w"));
-    //QThread::sleep();
-    gvFreeLayout(gvc, g);
-    return (gvFreeContext(gvc));
+    for (int i = AdjacencyMatrix.GetFirstIndexColumn(); i <= AdjacencyMatrix.GetLastIndexRow(); i++){
+        if (AdjacencyMatrix.IssetColumn(i))
+            Nods.push_back(QString::number(i));
+    }
+    return Nods;
 }
 
+string Graph::GetDotFile()
+{
+    return DotFile;
+}
 
-
-
-
-
+//void Graph::ChangeIncidenceMatrixCell(int Column, int Row, int Value)
+//{
+//    IncidenceMatrix.SetCell(Column, Row, Value);
+//}
 
