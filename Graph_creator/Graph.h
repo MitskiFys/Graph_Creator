@@ -57,14 +57,17 @@ public:
     int GetIndexFromHeader(int);//Получить индекс оглавления
     int GetShortestWayTo(int);//Получить коротки путь до
     bool CheckShortestWayToValue(int);//Проверить, есть ли короткий путь
-    int GetCountColumnIncMat();//Получить количество строк в матрице инцидентности
-    int GetCountRowIncMat();//Получить кличество столбиков в матрице инцидентности
+    int GetCountColumnIncMat();//Получить количество столбиков в матрице инцидентности
+    int GetCountColumnAdjMat();
+    int GetCountRowIncMat();//Получить кличество строк в матрице инцидентности
     QStringList GetDataFromIncMat();//Получить чем заполненна матрица инцидентности
+    QStringList GetDataFromAdjMat();
     int GetCountOfCycle();//просто баловался
     QStringList GetCurrentNods();//Получить текущие вершины
     string GetDotFile();//Запросить дот файл
-
-    //void ChangeIncidenceMatrixCell(int, int, int);
+    QStringList GetSecondValueInRowFromIncMatrix(int Row, int Column);
+    void ChangeIncidenceMatrixCell(int, int, int);
+    void ChangeAdjacencyMatrixCell(int, int, int);
 
 };
 #endif // GRAPH_H

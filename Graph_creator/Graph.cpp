@@ -201,11 +201,11 @@ void Graph::CreateDotFile(int From , int To)
     DotFile += "digraph graphname {\n";
     map <int, int> Way;
     if ((From != 0)&&(To != 0))
-    if (CheckShortestWayToValue(To))
-        while (From != To){
-            Way.insert(make_pair(To,ShortestWay[To]));
-            To = ShortestWay[To];
-        }
+        if (CheckShortestWayToValue(To))
+            while (From != To){
+                Way.insert(make_pair(To,ShortestWay[To]));
+                To = ShortestWay[To];
+            }
     for (int i = AdjacencyMatrix.GetFirstIndexRow(); i<= AdjacencyMatrix.GetLastIndexRow();i++){
         if (AdjacencyMatrix.IssetRow(i)){
             DotFile += to_string(i) + ";\n";
@@ -372,6 +372,11 @@ int Graph::GetCountColumnIncMat()
     return IncidenceMatrix.GetCountOfColumns();
 }
 
+int Graph::GetCountColumnAdjMat()
+{
+    return AdjacencyMatrix.GetCountOfColumns();
+}
+
 int Graph::GetCountRowIncMat()
 {
     return IncidenceMatrix.GetCountOfRows();
@@ -390,6 +395,27 @@ QStringList Graph::GetDataFromIncMat()
                         data.push_back(QString::number(RowCount));
                         data.push_back(QString::number(GetIndexFromHeader(j)));
                         data.push_back(QString::number(IncidenceMatrix(i,j)));
+                    }
+                }
+            }
+        }
+    }
+    return data;
+}
+
+QStringList Graph::GetDataFromAdjMat()
+{
+    QStringList data;
+    int RowCount = -1;
+    for (int i = AdjacencyMatrix.GetFirstIndexRow(); i!= AdjacencyMatrix.GetLastIndexRow()+1; i++){
+        if (AdjacencyMatrix.IssetRow(i)){
+            RowCount++;
+            for (int j = AdjacencyMatrix.GetFirstIndexColumn(); j!= AdjacencyMatrix.GetLastIndexColumn()+1; j++){
+                if (AdjacencyMatrix.IssetColumn(j)){
+                    if(AdjacencyMatrix(i,j)!=0){
+                        data.push_back(QString::number(RowCount));
+                        data.push_back(QString::number(GetIndexFromHeader(j)));
+                        data.push_back(QString::number(AdjacencyMatrix(i,j)));
                     }
                 }
             }
@@ -476,8 +502,37 @@ string Graph::GetDotFile()
     return DotFile;
 }
 
-//void Graph::ChangeIncidenceMatrixCell(int Column, int Row, int Value)
-//{
-//    IncidenceMatrix.SetCell(Column, Row, Value);
-//}
+QStringList Graph::GetSecondValueInRowFromIncMatrix(int Row, int Column)
+{
+    int Value = 0;
+    Row++;
+    Column++;
+    QStringList Values;
+
+    if (IncidenceMatrix.GetCountOfColumns() == 0){
+        return Values;
+    }
+    //GetIncidenceMatrix();
+    for (int i = IncidenceMatrix.GetFirstIndexColumn(); i <= IncidenceMatrix.GetLastIndexColumn(); i++){
+        if (IncidenceMatrix.IssetColumn(i)){
+            if (IncidenceMatrix(Row, i)!=0){
+                Value = IncidenceMatrix(Row, i);
+                Values.push_back(QString::number(i));
+                Values.push_back(QString::number(Value));
+            }
+        }
+    }
+    return Values;
+}
+
+void Graph::ChangeIncidenceMatrixCell(int Row, int Column, int Value)
+{
+    IncidenceMatrix.SetCell(Row, Column, Value);
+}
+
+void Graph::ChangeAdjacencyMatrixCell(int Row, int Column, int Value)
+{
+    AdjacencyMatrix.SetCell(Row, Column, Value);
+}
+
 

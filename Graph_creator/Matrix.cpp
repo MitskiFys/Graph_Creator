@@ -177,7 +177,8 @@ int Matrix::GetCountOfRows()
 
 int Matrix::GetCountOfColumns()
 {
-
+    if (MyMatrix.size()==0)
+        return 0;
     return (*MyMatrix.begin()).second.size();
 }
 
@@ -201,9 +202,10 @@ bool Matrix::IssetColumn(int Number)
     return false;
 }
 
-void Matrix::SetCell(int Column, int Row, int Value)
+void Matrix::SetCell(int Row, int Column, int Value)
 {
     (*(*this->MyMatrix.find(Row - 1)).second.find(Column - 1)).second = Value;
+
 }
 
 const int& Matrix::operator()(int& Row, int& Column)
