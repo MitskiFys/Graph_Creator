@@ -135,62 +135,6 @@ void Graph::GetIncidenceMatrix()
     IncidenceMatrix.DrawMatrix();
 }
 
-//void Graph::CreateDotFile()
-//{
-
-//    //    std::ofstream outfile ("graph.dot");
-//    DotFile = "";
-//    int FirtsNode = 0;
-//    int SecondNode = 0;
-//    int Direction = 1;
-//    DotFile += "digraph graphname {\n";
-//    //    cout << "------------------"<< endl;
-//    //    GetAdjacencyMatrix();
-//    //    cout << endl;
-//    //    GetIncidenceMatrix();
-//    //    cout << "------------------"<< endl;
-//    for (int i = AdjacencyMatrix.GetFirstIndexRow(); i<= AdjacencyMatrix.GetLastIndexRow();i++){
-//        if (AdjacencyMatrix.IssetRow(i)){
-//            DotFile += to_string(i) + ";\n";
-//        }
-//    }
-
-//    if (IncidenceMatrix.GetCountOfColumns()!=0){
-//        for (int i = IncidenceMatrix.GetFirstIndexRow(); i <= IncidenceMatrix.GetLastIndexRow(); i++){
-//            if (IncidenceMatrix.IssetRow(i)){
-//                for (int j = IncidenceMatrix.GetFirstIndexColumn(); j<= IncidenceMatrix.GetLastIndexColumn();j++){
-//                    if (IncidenceMatrix(i,j)==1){
-//                        FirtsNode = j;
-//                        Direction *= IncidenceMatrix(i,j);
-//                    } else if (IncidenceMatrix(i,j)==-1){
-//                        if (FirtsNode == 0)
-//                            FirtsNode = SecondNode;
-//                        SecondNode = j;
-//                        Direction *= IncidenceMatrix(i,j);
-//                    }
-//                }
-//                if ((FirtsNode == 0)&&(FirtsNode == SecondNode))
-//                    continue;
-//                if (FirtsNode == 0){
-//                    FirtsNode = SecondNode;
-//                    Direction*=-1;
-//                }
-//                DotFile += to_string(FirtsNode);
-//                if (Direction < 0) {
-//                    DotFile += "->" + to_string(SecondNode) + "[label = " + to_string(AdjacencyMatrix(FirtsNode,SecondNode)) + "]\n";
-//                } else {
-//                    DotFile += "->" + to_string(SecondNode) + "[dir=\"both\",label =" + to_string(AdjacencyMatrix(FirtsNode,SecondNode)) + "]\n";
-//                }
-//                FirtsNode =0;
-//                SecondNode = 0;
-//                Direction = 1;
-//            }
-
-//        }
-//    }
-//    DotFile += "}\n";
-//}
-
 void Graph::CreateDotFile(int From , int To)
 {
     DotFile = "";
@@ -199,6 +143,7 @@ void Graph::CreateDotFile(int From , int To)
     int SecondNode = 0;
     int Direction = 1;
     DotFile += "digraph graphname {\n";
+    DotFile += "graph [rankdir=LR] \n";//setting area https://graphviz.readthedocs.io/en/stable/manual.html
     map <int, int> Way;
     if ((From != 0)&&(To != 0))
         if (CheckShortestWayToValue(To))
@@ -527,12 +472,31 @@ QStringList Graph::GetSecondValueInRowFromIncMatrix(int Row, int Column)
 
 void Graph::ChangeIncidenceMatrixCell(int Row, int Column, int Value)
 {
+    Column = NodeHeaders[Column-1].toInt();
     IncidenceMatrix.SetCell(Row, Column, Value);
 }
 
-void Graph::ChangeAdjacencyMatrixCell(int Row, int Column, int Value)
+void Graph::ConnectNods(int From, int To, int Length, int EdgeIndex)
 {
-    AdjacencyMatrix.SetCell(Row, Column, Value);
+    EdgeIndex++;
+    AddedNods = AddedNods + to_string(From) + "with" + to_string(To)+"-"+to_string(EdgeIndex)+"-";
+    AdjacencyMatrix.AddDirectionalEdge(From, To, Length);
+
+}
+
+void Graph::DisconnectNods(int From, int To, int EdgeIndex)
+{
+    AdjacencyMatrix.AddBidirectionalEdge(From, To, 0);
+    EdgeIndex++;
+    string Nods =to_string(From) + "with" + to_string(To)+"-"+to_string(EdgeIndex)+"-";
+
+    if (AddedNods.find(Nods)!= std::string::npos){
+        AddedNods.erase(AddedNods.find(Nods),Nods.size());
+    }
+    Nods =to_string(To) + "with" + to_string(From)+"-"+to_string(EdgeIndex)+"-";
+    if (AddedNods.find(Nods)!= std::string::npos){
+        AddedNods.erase(AddedNods.find(Nods),Nods.size());
+    }
 }
 
 

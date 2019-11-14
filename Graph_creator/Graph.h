@@ -67,7 +67,7 @@ public:
     string GetDotFile();//Запросить дот файл
     QStringList GetSecondValueInRowFromIncMatrix(int Row, int Column);
     void ChangeIncidenceMatrixCell(int, int, int);
-    void ChangeAdjacencyMatrixCell(int, int, int);
-
+    void ConnectNods(int From, int To,int Length, int EdgeIndex);
+    void DisconnectNods(int From, int To, int EdgeIndex);
 };
 #endif // GRAPH_H

@@ -149,10 +149,12 @@ InputMatrixData::InputMatrixData(QWidget *pwgt) : QWidget(pwgt)
     connect(AdjacencyMatrix, SIGNAL(itemChanged(QTableWidgetItem*)),SLOT(slotAdjacencyCellUpdate()));
     connect(AdjacencyMatrix, SIGNAL(itemChanged(QTableWidgetItem*)),SLOT(slotUpdateIncMatrix()));
     connect(AdjacencyMatrix, SIGNAL(itemChanged(QTableWidgetItem*)),SLOT(slotShortWay()));
+    connect(AdjacencyMatrix, SIGNAL(itemChanged(QTableWidgetItem*)),SLOT(slotUpdateIncMatrix()));
 
     connect(IncidenceMatrix, SIGNAL(itemChanged(QTableWidgetItem*)),SLOT(slotIncidenceCellUpdate()));
     connect(IncidenceMatrix, SIGNAL(itemChanged(QTableWidgetItem*)),SLOT(slotUpdateAdjMatrix()));
     connect(IncidenceMatrix, SIGNAL(itemChanged(QTableWidgetItem*)),SLOT(slotShortWay()));
+    connect(IncidenceMatrix, SIGNAL(itemChanged(QTableWidgetItem*)),SLOT(slotUpdateIncMatrix()));
 
     connect(DeleteNode, SIGNAL(clicked()),SLOT(slotDeleteNode()));
     connect(DeleteNode, SIGNAL(clicked()),SLOT(slotUpdateIncMatrix()));
@@ -393,64 +395,37 @@ void InputMatrixData::slotIncidenceCellUpdate()
     int item = (IncidenceMatrix->currentItem()->text()).toInt();
     int CurrentColumn = (IncidenceMatrix->currentColumn());
     int CurrentRow = (IncidenceMatrix->currentRow());
+    int CurrentNode = MyGraph.NodeHeaders[CurrentColumn].toInt();
     QStringList OtherItems = MyGraph.GetSecondValueInRowFromIncMatrix(CurrentRow, CurrentColumn);
     int Value = abs(item);
     if (item != 0){
         item = item / abs(item);
     }
     if (OtherItems.size() == 0){
-        if (item != -1)
+        if (item == 1)
             item = -1;
-        newItem->setText(QString::number(item));
-        //Signal = true;
-        IncidenceMatrix->setItem(CurrentRow, CurrentColumn, newItem);
-        MyGraph.ChangeAdjacencyMatrixCell(CurrentColumn+1, CurrentColumn+1, Value);
+        MyGraph.ConnectNods(CurrentNode, CurrentNode, Value, CurrentRow);
         MyGraph.ChangeIncidenceMatrixCell(CurrentRow+1, CurrentColumn+1, item);
-
     }else if (OtherItems.size() == 2){
         int PrevNods = OtherItems[0].toInt();
-        int PrevItem = OtherItems[1].toInt();
-        if (PrevNods == CurrentColumn + 1){
-            if (item == 0)
-                item = 0;
-                else if (item != -1)
+        if (PrevNods == CurrentNode){
+            if (item == 1)
                 item = -1;
-            MyGraph.ChangeAdjacencyMatrixCell(PrevNods, PrevNods, 0);
-            MyGraph.ChangeAdjacencyMatrixCell(PrevNods, PrevNods, Value);
-            newItem->setText(QString::number(item));
-            //Signal = true;
-            IncidenceMatrix->setItem(CurrentRow, CurrentColumn, newItem);
+            MyGraph.ConnectNods(CurrentNode, CurrentNode, Value, CurrentRow);
             MyGraph.ChangeIncidenceMatrixCell(CurrentRow + 1,CurrentColumn +1, item );
         } else if (item == -1){
-
-            MyGraph.ChangeAdjacencyMatrixCell(PrevNods, PrevNods, 0);
-            MyGraph.ChangeAdjacencyMatrixCell(PrevNods, CurrentColumn + 1, Value);
-            MyGraph.ChangeAdjacencyMatrixCell(CurrentColumn + 1, PrevNods,  Value);
-
-            newItem->setText(QString::number(item));
-            //Signal = true;
-            IncidenceMatrix->setItem(CurrentRow, CurrentColumn, newItem);
+            MyGraph.DisconnectNods(PrevNods, PrevNods, CurrentRow);
+            MyGraph.ConnectNods(PrevNods, CurrentNode, Value, CurrentRow);
+            MyGraph.ConnectNods(CurrentNode, PrevNods, Value, CurrentRow);
             MyGraph.ChangeIncidenceMatrixCell( CurrentRow+1, CurrentColumn+1, item);
-
         } else if (item == 1){
-
-            MyGraph.ChangeAdjacencyMatrixCell(PrevNods, PrevNods, 0);
-            MyGraph.ChangeAdjacencyMatrixCell(CurrentColumn + 1, PrevNods,  Value);
-
-            newItem->setText(QString::number(item));
-            //Signal = true;
-            IncidenceMatrix->setItem(CurrentRow, CurrentColumn, newItem);
+            MyGraph.DisconnectNods(PrevNods, PrevNods, CurrentRow);
+            MyGraph.ConnectNods(CurrentNode, PrevNods, Value, CurrentRow);
             MyGraph.ChangeIncidenceMatrixCell( CurrentRow+1, CurrentColumn+1, item);
         } else if (item == 0){
             MyGraph.ChangeIncidenceMatrixCell(CurrentRow+1, CurrentColumn+1, 0);
             MyGraph.ChangeIncidenceMatrixCell(CurrentRow+1, PrevNods, -1);
-
-            MyGraph.ChangeAdjacencyMatrixCell(CurrentColumn + 1, PrevNods, 0);
-            MyGraph.ChangeAdjacencyMatrixCell(PrevNods, CurrentColumn + 1, 0);
-
-            newItem->setText(QString::number(-1));
-            //Signal = true;
-            IncidenceMatrix->setItem(CurrentRow, CurrentColumn, newItem);
+            MyGraph.DisconnectNods(CurrentNode, PrevNods, CurrentRow);
         }
 
     } else if (OtherItems.size() == 4) {
@@ -461,116 +436,56 @@ void InputMatrixData::slotIncidenceCellUpdate()
 
         if (item == 0){
             MyGraph.ChangeIncidenceMatrixCell(CurrentRow + 1, CurrentColumn+1, 0);
-            MyGraph.ChangeAdjacencyMatrixCell(FirstNode, SecondNode, 0);
-            MyGraph.ChangeAdjacencyMatrixCell(SecondNode, FirstNode,0);
+            MyGraph.DisconnectNods(FirstNode, SecondNode, CurrentRow);
             newItem->setText("");
-
-            //MyGraph.ChangeAdjacencyMatrixCell(SecondNode, SecondNode,1);
-            //Signal = true;
-            IncidenceMatrix->setItem(CurrentRow, CurrentColumn, newItem);
             if (CurrentColumn + 1 == FirstNode){
                 CurrentColumn = SecondNode;
-                QTableWidgetItem* newItem1 = new QTableWidgetItem;
-                newItem1->setText(QString::number(-1));
-                //Signal = true;
-                IncidenceMatrix->setItem(CurrentRow, SecondNode - 1, newItem1);
                 MyGraph.ChangeIncidenceMatrixCell(CurrentRow + 1, SecondNode, -1);
-                MyGraph.ChangeAdjacencyMatrixCell(SecondNode, SecondNode, 1);
+                MyGraph.ConnectNods(SecondNode, SecondNode, 1, CurrentRow);
 
 
             } else if (CurrentColumn + 1 == SecondNode){
                 CurrentColumn = FirstNode;
-                QTableWidgetItem* newItem1 = new QTableWidgetItem;
-                newItem1->setText(QString::number(-1));
-                //Signal = true;
-                IncidenceMatrix->setItem(CurrentRow, FirstNode - 1, newItem1);
                 MyGraph.ChangeIncidenceMatrixCell(CurrentRow + 1, FirstNode, -1);
-                MyGraph.ChangeAdjacencyMatrixCell(FirstNode, FirstNode, 1);
-            } /*else {
-                QTableWidgetItem* newItem1 = new QTableWidgetItem;
-                newItem1->setText("");
-                //Signal = true;
-                IncidenceMatrix->setItem(CurrentRow, CurrentColumn, newItem1);
-                MyGraph.ChangeIncidenceMatrixCell(CurrentRow + 1, CurrentColumn + 1, 0);
-            }*/
-
+                MyGraph.ConnectNods(FirstNode, FirstNode, 1, CurrentRow);
+            }
         } else if(item == 1){
-            QTableWidgetItem* newItem2 = new QTableWidgetItem;
-            newItem2->setText(QString::number(item));
-            //Signal = true;
-            IncidenceMatrix->setItem(CurrentRow, CurrentColumn, newItem2);
             if (CurrentColumn + 1 == FirstNode){
-                MyGraph.ChangeAdjacencyMatrixCell(FirstNode, SecondNode, 0);
-                MyGraph.ChangeAdjacencyMatrixCell(SecondNode, FirstNode, 0);
-                MyGraph.ChangeAdjacencyMatrixCell(FirstNode, SecondNode, Value);
+                MyGraph.DisconnectNods(FirstNode, SecondNode, CurrentRow);
+                MyGraph.ConnectNods(FirstNode, SecondNode, Value, CurrentRow);
                 MyGraph.ChangeIncidenceMatrixCell(CurrentRow + 1, SecondNode, -1);//Меняем все в матрице инцидентности
                 MyGraph.ChangeIncidenceMatrixCell(CurrentRow + 1, CurrentColumn +1, 1);
 
-                QTableWidgetItem* newItem1 = new QTableWidgetItem;
-                newItem1->setText(QString::number(-1));
-                //Signal = true;
-                IncidenceMatrix->setItem(CurrentRow, SecondNode - 1, newItem1);
-
             }else if(CurrentColumn + 1 == SecondNode){
-                MyGraph.ChangeAdjacencyMatrixCell(FirstNode, SecondNode, 0);
-                MyGraph.ChangeAdjacencyMatrixCell(SecondNode, FirstNode, 0);
-                MyGraph.ChangeAdjacencyMatrixCell(SecondNode, FirstNode, Value);
-
+                MyGraph.DisconnectNods(FirstNode, SecondNode, CurrentRow);
+                MyGraph.ConnectNods(SecondNode, FirstNode, Value, CurrentRow);
                 MyGraph.ChangeIncidenceMatrixCell(CurrentRow + 1, FirstNode, -1);//Меняем все в матрице инцидентности
                 MyGraph.ChangeIncidenceMatrixCell(CurrentRow + 1, CurrentColumn +1, 1);
-                QTableWidgetItem* newItem1 = new QTableWidgetItem;
-                newItem1->setText(QString::number(-1));
-                //Signal = true;
-                IncidenceMatrix->setItem(CurrentRow, FirstNode - 1, newItem1);
             }else {
-                MyGraph.ChangeAdjacencyMatrixCell(FirstNode, SecondNode, 0);
-                MyGraph.ChangeAdjacencyMatrixCell(SecondNode, FirstNode, 0);//Очищяем связи с первой вершиной
+                MyGraph.DisconnectNods(FirstNode, SecondNode, CurrentRow);
+                MyGraph.ConnectNods(CurrentNode, SecondNode, Value, CurrentRow);
                 MyGraph.ChangeIncidenceMatrixCell(CurrentRow + 1, FirstNode, 0);
-
-                QTableWidgetItem* newItem1 = new QTableWidgetItem;
-                newItem1->setText("");
-                Signal = true;
-                IncidenceMatrix->setItem(CurrentRow, FirstNode -1, newItem1);
-
-                MyGraph.ChangeAdjacencyMatrixCell(CurrentColumn + 1, SecondNode, Value);
                 MyGraph.ChangeIncidenceMatrixCell(CurrentRow + 1, SecondNode, -1);
                 MyGraph.ChangeIncidenceMatrixCell(CurrentRow + 1, CurrentColumn + 1, 1);
-
-                newItem->setText(QString::number(-1));
-                //Signal = true;
-                IncidenceMatrix->setItem(CurrentRow, SecondNode -1, newItem);
             }
 
         }else if (item == -1) {
-            QTableWidgetItem* newItem2 = new QTableWidgetItem;
-            newItem2->setText(QString::number(item));
-            //Signal = true;
-            IncidenceMatrix->setItem(CurrentRow, CurrentColumn, newItem2);
             MyGraph.ChangeIncidenceMatrixCell(CurrentRow + 1, CurrentColumn +1, -1);
             if (CurrentColumn + 1 == FirstNode){
-                MyGraph.ChangeAdjacencyMatrixCell(FirstNode, SecondNode, 0);
-                MyGraph.ChangeAdjacencyMatrixCell(SecondNode, FirstNode, 0);
-                MyGraph.ChangeAdjacencyMatrixCell(FirstNode, SecondNode, Value);
+                MyGraph.DisconnectNods(FirstNode, SecondNode, CurrentRow);
+                MyGraph.ConnectNods(FirstNode, SecondNode, Value, CurrentNode);
                 if (SecondItem == -1)
-                MyGraph.ChangeAdjacencyMatrixCell(FirstNode, SecondNode,  Value);
+                    MyGraph.ConnectNods(FirstNode, SecondNode, Value, CurrentRow);
 
             }else if(CurrentColumn + 1 == SecondNode){
-                MyGraph.ChangeAdjacencyMatrixCell(FirstNode, SecondNode, 0);
-                MyGraph.ChangeAdjacencyMatrixCell(SecondNode, FirstNode, 0);
-                MyGraph.ChangeAdjacencyMatrixCell(SecondNode, FirstNode, Value);
+                MyGraph.DisconnectNods(FirstNode, SecondNode, CurrentRow);
+                MyGraph.ConnectNods(SecondNode, FirstNode, Value, CurrentRow);
                 if (FirstItem == -1)
-                MyGraph.ChangeAdjacencyMatrixCell(FirstNode, SecondNode,  Value);
+                    MyGraph.ConnectNods(FirstNode, SecondNode, Value, CurrentRow);
             }else {
-                MyGraph.ChangeAdjacencyMatrixCell(FirstNode, SecondNode, 0);
-                MyGraph.ChangeAdjacencyMatrixCell(SecondNode, FirstNode, 0);//Очищяем связи с первой вершиной
+                MyGraph.DisconnectNods(FirstNode, SecondNode, CurrentRow);
                 MyGraph.ChangeIncidenceMatrixCell(CurrentRow + 1, FirstNode, 0);
-
-                QTableWidgetItem* newItem1 = new QTableWidgetItem;
-                newItem1->setText("");
-                //Signal = true;
-                IncidenceMatrix->setItem(CurrentRow, FirstNode -1, newItem1);
-
-                MyGraph.ChangeAdjacencyMatrixCell(CurrentColumn + 1, SecondNode, Value);
+                MyGraph.ConnectNods(CurrentNode, SecondNode, Value, CurrentRow);
             }
 
         }
@@ -599,6 +514,7 @@ void InputMatrixData::SetImage(int From, int To)
 
 void InputMatrixData::slotSetImage()
 {
+
     QPixmap pixmap("graph.svg");
     Image->setPixmap(pixmap);
     remove("graph.svg");
