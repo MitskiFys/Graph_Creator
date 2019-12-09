@@ -11,6 +11,8 @@
 #include <QtSvg/QSvgWidget>
 #include "ImageCreator.h"
 #include <math.h>
+#include "MyScene.h"
+
 class InputMatrixData : public QWidget
 {
     Q_OBJECT
@@ -28,12 +30,16 @@ private:
     QPushButton   *createButton(const QString str);
     Graph         MyGraph;
     ImageCreator* imageCreator = new ImageCreator;
+    MyScene       *scene;
     bool          Signal = 0;
     void SetImage(int From = 0, int To = 0);
+    int countNodsFromVisual = 0;
 
 public:
     InputMatrixData(QWidget* pwgt = nullptr);
 signals:
+    void deletedNode(int);
+protected:
 
 private slots:
     void slotSetImage();
@@ -45,6 +51,8 @@ private slots:
     void slotShortWay();
     void slotAddEdge();
     void slotIncidenceCellUpdate();
+
+    void slotAddBiDirectionalEdge(int fisrt, int second);
 };
 
 

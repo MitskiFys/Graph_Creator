@@ -19,14 +19,20 @@ SOURCES += \
     Graph.cpp \
     ImageCreator.cpp \
     Matrix.cpp \
+    MyEllipse.cpp \
+    MyScene.cpp \
     WidgetMatrixData.cpp \
+    WidgetVisualGraph.cpp \
     main.cpp \
 
 HEADERS += \
     Graph.h \
     ImageCreator.h \
     Matrix.h \
-    WidgetMatrixData.h \
+    MyEllipse.h \
+    MyScene.h \
+    WidgetMatrixData.h \ \
+    WidgetVisualGraph.h
 
 
 LIBS += -lgvc -lcgraph -lcdt

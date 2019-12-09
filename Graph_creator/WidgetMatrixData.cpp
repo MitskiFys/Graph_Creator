@@ -47,8 +47,8 @@ InputMatrixData::InputMatrixData(QWidget *pwgt) : QWidget(pwgt)
     ShortestWay->setAlignment(NodsForShWay ,Qt::AlignCenter);
 
     shortestWayGroup->setLayout(ShortestWay);
-    shortestWayGroup->setMinimumSize(320,120);
-    shortestWayGroup->setMaximumSize(320,120);
+    shortestWayGroup->setMinimumSize(250,120);
+    shortestWayGroup->setMaximumSize(250,120);
 
     Image = new QLabel;
 
@@ -56,6 +56,7 @@ InputMatrixData::InputMatrixData(QWidget *pwgt) : QWidget(pwgt)
     imageBox->setAlignment(Image,Qt::AlignCenter);
     imageGroup->setLayout(imageBox);
     imageGroup->setMinimumSize(320,320);
+    //LayWithImageAndShortestWay->addWidget(view);
     LayWithImageAndShortestWay->addWidget(imageGroup);
 
     //Button Area Setup
@@ -129,14 +130,22 @@ InputMatrixData::InputMatrixData(QWidget *pwgt) : QWidget(pwgt)
     functionalArea->setAlignment(Qt::AlignCenter);
 
     //Layout setup
+    scene = new MyScene;
+
+    scene->setSceneRect(0, 0, 590, 390);
+
+    QGraphicsView *view1 = new QGraphicsView(scene);
+    view1->setMaximumSize(600,400);
     UpArea->addWidget(imageGroup);
     UpArea->addWidget(shortestWayGroup);
+    UpArea->addWidget(view1);
     UpArea->setAlignment(shortestWayGroup, Qt::AlignTop);
     MainArea->addItem(UpArea);
     MainArea->addItem(functionalArea);
 
+    //view1->setMinimumSize(900,400);
+    //MainArea->addWidget(view1);
     setLayout(MainArea);
-
     //connect setup
 
 
@@ -163,9 +172,21 @@ InputMatrixData::InputMatrixData(QWidget *pwgt) : QWidget(pwgt)
     connect(ShortestWayFrom, SIGNAL(currentIndexChanged(int)),SLOT(slotShortWay()));
     connect(ShortestWayTo, SIGNAL(currentIndexChanged(int)),SLOT(slotShortWay()));
 
+    connect(scene, SIGNAL(addNode()), SLOT(slotAddNode()));
+    connect(scene, SIGNAL(addNode()),SLOT(slotUpdateIncMatrix()));
+    connect(scene, SIGNAL(addNode()),SLOT(slotShortWay()));
+
+    connect(scene, SIGNAL(connectNods(int, int)), SLOT(slotAddBiDirectionalEdge(int,int)));
+    connect(scene, SIGNAL(connectNods(int, int)), SLOT(slotUpdateIncMatrix()));
+    connect(scene, SIGNAL(connectNods(int, int)), SLOT(slotUpdateAdjMatrix()));
+    connect(scene, SIGNAL(connectNods(int, int)), SLOT(slotShortWay()));
+
+    connect(this, SIGNAL(deletedNode(int)), scene, SLOT(slotDeleteNode(int)));
+
     //add Image
     slotShortWay();
 }
+
 
 void InputMatrixData::slotAddNode()
 {
@@ -272,6 +293,10 @@ void InputMatrixData::slotDeleteNode()
 
     QString Number = ActiveNodes->currentText();
     int DeleteIndexHeader = MyGraph.GetIndexFromHeader(Number.toInt());
+    if (countNodsFromVisual != 0){
+        emit deletedNode(Number.toInt());
+        countNodsFromVisual--;
+    }
     if (AdjacencyMatrix->columnCount()!=1){
         AdjacencyMatrix->removeColumn(DeleteIndexHeader);
         AdjacencyMatrix->removeRow(DeleteIndexHeader);
@@ -490,11 +515,16 @@ void InputMatrixData::slotIncidenceCellUpdate()
 
         }
     }
-    MyGraph.GetAdjacencyMatrix();
-    MyGraph.GetIncidenceMatrix();
     Signal = false;
     cout << Signal << endl;
 }
+
+void InputMatrixData::slotAddBiDirectionalEdge(int first, int second)
+{
+    countNodsFromVisual++;
+    MyGraph.AddBidirectionalEdge(first, second, 1);
+}
+
 
 void InputMatrixData::SetImage(int From, int To)
 {

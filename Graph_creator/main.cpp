@@ -13,6 +13,7 @@
 #include <Graph.h>
 #include <WidgetMatrixData.h>
 #include <QtSvg/QGraphicsSvgItem>
+#include "MyScene.h"
 using namespace std;
 
 
@@ -22,6 +23,18 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     InputMatrixData MyWindow;
+
+//    MyScene scene;
+//    QGraphicsView view(&scene);
+//    scene.setSceneRect(0, 0, 580, 580);
+
+//    QObject::connect(&scene, SIGNAL(addNode()), &MyWindow, SLOT(slotAddNode()));
+//    QObject::connect(&scene, SIGNAL(addNode()), &MyWindow, SLOT(slotUpdateIncMatrix()));
+//    QObject::connect(&scene, SIGNAL(addNode()), &MyWindow, SLOT(slotUpdateAdjMatrix()));
+//    QObject::connect(&scene, SIGNAL(addNode()), &MyWindow, SLOT(slotShortWay()));
+   // QObject::connect(scene, SIGNAL(addNode()), MyWindow, SLOT(AddNode()));
+
+    //view.show();
     MyWindow.show();
 
 //    WidgetShowImage image;

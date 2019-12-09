@@ -498,5 +498,3 @@ void Graph::DisconnectNods(int From, int To, int EdgeIndex)
         AddedNods.erase(AddedNods.find(Nods),Nods.size());
     }
 }
-
-
